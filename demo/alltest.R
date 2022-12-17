@@ -36,7 +36,7 @@ baseline<-logL(mixD)(pars)
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=2,C=rep(list(C),length(list(epg))),database=db,triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-replace.tables.for.IBD(mixD,c(0.5,0.5,0),c(1,2))
+rpt.IBD(mixD,c(0.5,0.5,0),,c(1,2))
 size(mixD)
 log10LR<-(logL(mixD)(pars)-baseline)/log(10)
 cat('log10 LR',log10LR,'\n')
@@ -80,7 +80,7 @@ size(mixD)
 
 mixD<-DNAmixture(list(epg),k=3,C=rep(list(C),length(list(epg))),database=db,triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-replace.tables.for.IBD(mixD,kin=f2sons,1:3)
+rpt.IBD(mixD,IBD=f2sons,,1:3)
 size(mixD)
 
 log10LR<-(logL(mixD)(pars3)-baseline3)/log(10)
@@ -94,7 +94,7 @@ t2<-Sys.time(); print(difftime(t2,t1))
 
 t1<-Sys.time()
 listdata<-list(epg)
-loop.rpt.single.pattern.IBD(listdata,kinship=f2sons,pars=pars3,k=3,C=rep(list(C),length(listdata)),database=db)
+loop.rpt.IBD(listdata,IBD=f2sons,pars=pars3,k=3,C=rep(list(C),length(listdata)),database=db)
 t2<-Sys.time(); print(difftime(t2,t1))
 
 ## (3c) - using rpt.typed.relatives
@@ -102,7 +102,7 @@ t2<-Sys.time(); print(difftime(t2,t1))
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=3,C=rep(list(C),length(list(epg))),database=db,triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-rpt.typed.relatives(mixD,kin=f2sons,list(),1:3,jtyped=NULL)
+rpt.typed.relatives(mixD,IBD=f2sons,list(),1:3,jtyped=NULL)
 size(mixD)
 log10LR<-(logL(mixD)(pars3)-baseline3)/log(10)
 cat('log10 LR',log10LR,'\n')
@@ -126,7 +126,7 @@ hs<-list(pr=c(0.5,0.5),patt=matrix(c(1,1,3,3,1,2,4,4,1,2,4,4),2,6))
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=2,C=list(C),database=db,dyes=list(NGMDyes),triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-rpt.typed.relatives(mixD,kinship=hs,typed.gts=list(Rgt))
+rpt.typed.relatives(mixD,IBD=hs,typed.gts=list(Rgt))
 size(mixD)
 log10LR<-(logL(mixD)(pars)-baseline)/log(10)
 cat('log10 LR',log10LR,'\n')
@@ -154,14 +154,14 @@ structure(list(pr = c(0.25, 0.25, 0.25, 0.25), patt = structure(c(1,
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=2,C=list(C),database=db,dyes=list(NGMDyes),triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-rpt.typed.relatives(mixD,kinship=c2pars,typed.gts=list(Mgt,Fgt))
+rpt.typed.relatives(mixD,IBD=c2pars,typed.gts=list(Mgt,Fgt))
 size(mixD)
 log10LR<-(logL(mixD)(pars)-baseline)/log(10)
 cat('log10 LR',log10LR,'\n')
 t2<-Sys.time(); print(difftime(t2,t1))
 
 ## (6a) Test for double paternity - fit 4 person mixture with contributor 1 the father of contributors 3 and 4, and 
-## then set genotypes of contributors 3 and 4, using replace.tables.for.IBD
+## then set genotypes of contributors 3 and 4, using rpt.IBD
 ## (code works in principle for any number of contributors, any number of which can be related in any way, and with 
 ## any of these typed). Note U3 and U4 excluded from mixture by setting phi=0 for U3 and U4
 
@@ -174,7 +174,7 @@ sons$patt<-sons$patt[,3:6]
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=4,C=rep(list(C),length(list(epg))),database=db,triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-replace.tables.for.IBD(mixD,kin=sons,c(3,4))
+rpt.IBD(mixD,IBD=sons,,c(3,4))
 S1aca<<-gt2aca(mixD,S1gt)# ,1e-8) 
 S2aca<<-gt2aca(mixD,S2gt)# ,1e-8) 
 extra.findings<-make.findings(list(
@@ -184,27 +184,12 @@ extra.findings<-make.findings(list(
 baseline4<-logLX(mixD)(pars4)
 t2<-Sys.time(); print(difftime(t2,t1)) 
 
-t1<-Sys.time()
-mixD<-DNAmixture(list(epg),k=4,C=rep(list(C),length(list(epg))),database=db,triangulate=FALSE,compile=FALSE)
-delete.DQnodes(mixD)
-replace.tables.for.IBD(mixD,kin=f2sons,c(1,3,4))
-S1aca<<-gt2aca(mixD,S1gt,1e-8) 
-S2aca<<-gt2aca(mixD,S2gt,1e-8) 
-extra.findings<-make.findings(list(
-	list('Aca',ind=3,aca='S1aca'),
-	list('Aca',ind=4,aca='S2aca')
-	))
-size(mixD)
-log10LR<-(logLX(mixD)(pars4)-baseline4)/log(10)
-cat('log10 LR',log10LR,'\n')
-t2<-Sys.time(); print(difftime(t2,t1)) 
-
 ## (6b) .. using rpt.typed.relatives
 
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=2,C=list(C),database=db,dyes=list(NGMDyes),triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-rpt.typed.relatives(mixD,kinship=f2sons,typed.gts=list(S1gt,S2gt))
+rpt.typed.relatives(mixD,IBD=f2sons,typed.gts=list(S1gt,S2gt))
 size(mixD)
 log10LR<-(logL(mixD)(pars)-baseline)/log(10)
 cat('log10 LR',log10LR,'\n')
@@ -270,14 +255,14 @@ log10LR<-(logL(mixD)(pars)-baseline)/log(10)
 cat('log10 LR',log10LR,'\n')
 t2<-Sys.time(); print(difftime(t2,t1))
 
-## (11) Check that rpt.typed.relatives with no one typed gets same answer as replace.tables.for.IBD
+## (11) Check that rpt.typed.relatives with no one typed gets same answer as rpt.IBD
 
-kinship<-list(pr=1,patt=matrix(c(1,2,1,3,2,4),1,6))
+IBD<-list(pr=1,patt=matrix(c(1,2,1,3,2,4),1,6))
 
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=3,C=rep(list(C),length(list(epg))),database=db,triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-replace.tables.for.IBD(mixD,kinship,1:3)
+rpt.IBD(mixD,IBD,,1:3)
 size(mixD)
 log10LR<-(logL(mixD)(pars3)-baseline)/log(10)
 cat('log10 LR',log10LR,'\n')
@@ -286,7 +271,7 @@ t2<-Sys.time(); print(difftime(t2,t1))
 t1<-Sys.time()
 mixD<-DNAmixture(list(epg),k=3,C=rep(list(C),length(list(epg))),database=db,triangulate=FALSE,compile=FALSE)
 delete.DQnodes(mixD)
-rpt.typed.relatives(mixD,kinship,list(),inds=1:3,jtyped=NULL,jcontr=1:3) 
+rpt.typed.relatives(mixD,IBD,list(),inds=1:3,jtyped=NULL,jcontr=1:3) 
 size(mixD)
 log10LR<-(logL(mixD)(pars3)-baseline)/log(10)
 cat('log10 LR',log10LR,'\n')
