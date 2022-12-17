@@ -30,7 +30,7 @@ Peter Green (P.J.Green@bristol.ac.uk)
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{KinMix}}, \code{\link{SimCE}}, \code{\link{getDb}}
+\code{\link{KinMix}}, \code{\link{getDb}}
 }
 \examples{
 require(KinMix)
