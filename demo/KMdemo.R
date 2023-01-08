@@ -61,10 +61,7 @@ cat('log10 LR',log10LR,'\n')
 
 ## show 'deconvolution'
 
-summary(map.genotypes(mixD2,pmin=0.001,U=1))
+summary(map.genotypes(mixD2,pmin=0.001,U=1:2))
 
-## plot one of the DAGs
-
-if(is(mixD2$dom$D12,'gRv')) plot(mixD2$dom$D12$net,type='dag')
 
 t2<-Sys.time(); print(difftime(t2,t1))
